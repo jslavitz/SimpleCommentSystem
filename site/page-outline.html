@@ -1,0 +1,76 @@
+<link rel="import" href="../components/core-icon-button/core-icon-button.html">
+<link href="../components/core-input/core-input.html" rel="import">
+<link rel="import" href="new-post.html">
+<link rel="import" href="../post-service/post-service.html">
+<link rel="import" href="completed-post.html">
+
+<polymer-element name="page-outline" attributes="url editurl key">
+	
+	<template>
+		<style>
+		:host {
+	      display: block;
+	      text-align: center;
+	      width: 100%;
+	    }
+	    img{
+	    	margin-bottom:30px;
+	    }
+		</style>
+
+		<!--Create variable 'posts' which has an avatar attribute-->
+		<post-service id="service" posts="{{posts}}"></post-service> 
+
+		<img src="{{url}}" width="90%" height="90%">
+
+        <template repeat="{{userPost in userPosts}}">
+        	<style>
+			    completed-post {
+			      margin-bottom: 30px;
+			    }
+			</style>
+        	<completed-post>
+        		<img src="../images/avatar-{{userPost[2]}}.svg" width="70" height="70"> <!--graphic-->
+        		<h2>{{userPost[0]}}</h2> <!--name-->
+        		<template repeat="{{line in userPost[1]}}">
+	        		<h3>{{line}}</h3></br>
+	        	</template>
+        	</completed-post>
+        </template>
+        <new-post on-update-posts="{{updateUserPosts}}" editurl="{{editurl}}" key="{{key}}"></new-post>
+	</template>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script>
+		Polymer('page-outline',{
+			
+			publish: {
+				userPosts: [],
+				editurl: ""
+			},
+			url: "http://i.imgur.com/0asxMww.jpg",
+
+
+			ready: function(){
+				this.userPosts = [];
+				this.updateUserPosts();
+			},
+			updateUserPosts: function(){
+				var tempPosts = [];
+				var loadURL = this.editurl.replace("edit", "load");
+				$.getJSON( loadURL, function(serverData) 
+				{
+        			var cData = serverData.data.trim().split('\n');
+        			for(var i = 0; i < cData.length; i += 3)
+        			{
+        				//Name, Comment, ID
+        				var commentLines = cData[i+1].split('\\n');
+        				//console.log(commentLines[0])
+        				//var commentLines = cData[i+1].replace(/\\n/g,"\r\n")
+        				tempPosts[tempPosts.length] = [cData[i], commentLines, cData[i+2]];
+        			}
+        		});
+				this.userPosts = tempPosts;
+			},
+		});
+	</script>
+</polymer-element>

@@ -1,0 +1,31 @@
+﻿<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="page-outline.html">
+
+<polymer-element name="post-list" attributes="show">
+  <template>    
+    <div layout vertical center>
+
+      <page-outline hidden?="{{show != 'all'}}" 
+        url="http://i.imgur.com/1qQ1seC.jpg"
+        editurl="http://tuftsceeo.pencilcode.net/edit/HTMLTutorialStuff/page1"
+        key="814"></page-outline>
+
+      <page-outline hidden?="{{show != 'favorites'}}" 
+        url="http://i.imgur.com/0asxMww.jpg"
+        editurl="http://tuftsceeo.pencilcode.net/edit/HTMLTutorialStuff/page2"
+        key="814"></page-outline>
+
+      <page-outline hidden?="{{show != 'tutorials'}}" 
+        url="http://i.imgur.com/yUtx4ag.jpg"
+        editurl="http://tuftsceeo.pencilcode.net/edit/HTMLTutorialStuff/page3"
+        key="814"></page-outline>
+
+    </div>
+  </template>
+
+  <script>
+
+  Polymer('post-list',{
+  });
+  </script>
+</polymer-element>

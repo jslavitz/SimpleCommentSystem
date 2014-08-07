@@ -1,0 +1,132 @@
+﻿<link rel="import" href="../components/polymer/polymer.html">
+<link rel="import" href="../components/core-icon-button/core-icon-button.html">
+<link href="../components/core-input/core-input.html" rel="import">
+
+<polymer-element name="new-post" attributes="editurl key">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+        background-color: white;
+        padding: 20px;
+        width: 100%;
+        font-size: 1.2rem;
+        font-weight: 300;
+      }
+      .card-header {
+        margin-bottom: 10px;
+      }
+      polyfill-next-selector { content: '.card-header h2'; }
+      .card-header ::content h2 {
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: 300;
+      }
+      polyfill-next-selector { content: '.card-header img'; }
+      .card-header img {
+        width: 70px;
+        border-radius: 50%;
+        margin: 10px;
+      }
+      /*------Core  Input----*/
+      core-input[multiline] {
+        border: 1px dotted #ccc;
+      }
+      core-input.sized {
+        width: 100%;
+        height: 100px;
+        margin-bottom: 8px;
+      }
+      core-icon-button {
+        position: absolute;
+        bottom: 3px;
+        right: 18px;
+        fill: #636363;
+      }
+      .validation core-input,
+      .validation core-input[multiline] {
+        border: solid 1px lime;
+        width: 100%;
+      }
+
+      .validation core-input.invalid,
+      .validation core-input[multiline].invalid {
+        border: solid 1px red;
+      }
+      :host([favorite]) core-icon-button {
+        fill: #da4336;
+      }
+    </style>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+    <div class="card-header" layout horizontal center>
+      <img src="../images/avatar-{{userId}}.svg" width="70" height="70">
+      <h2>
+        <div class="validation">
+          <core-input 
+            id="validate-ml-required" 
+            required placeholder="Name"
+            inputValue="{{nameInput}}"></core-input>
+        </div>
+      </h2>
+    </div>
+    <p>
+      <section horizontal start layout>
+        <core-input class="sized" 
+          multiline rows="fit" 
+          placeholder="Write your reply..."
+          inputValue="{{commentInput}}"></core-input>
+      </section>
+    </p>
+    <core-icon-button
+      id="replyButton"
+      icon="create"
+      on-tap="{{addCommmentTapped}}">Post Reply
+    </core-icon-button>
+  </template>
+
+  <script>
+  Polymer('new-post', {
+    publish: {
+      nameInput: "",
+      commentInput: "",
+      userId: 1,
+      editurl: "",
+      key: 0
+    },
+    ready: function(){
+      this.userId = Math.floor(Math.random() * 16)+ 1;
+      console.log(this.userId);
+    },
+    //Simply appends the name + comment + uID to the 'database' which has the comments
+    addCommmentTapped: function(event, detail, sender){
+      var name = this.nameInput;
+      var comment = this.commentInput.replace(/(\r\n|\n|\r)/gm,"\\n");
+      var userId = this.userId; //Generates a random number between 0 and 16
+      var thisObj = this;
+
+      var loadURL = this.editurl.replace("edit", "load");
+      var saveURL = this.editurl.replace("edit","save");
+      saveURL += "?key=" + this.key;
+
+      $.getJSON( loadURL, function(oldData) 
+      {
+        var mOldData = oldData.data.trim();
+
+        $.getJSON( saveURL, {data: 
+            mOldData + "\n" +
+            name + "\n" + //User's name
+            comment + "\n" + //User's comment
+            userId //User's Id
+            }
+            ).done(function(data) {
+              thisObj.fire('update-posts')
+        })
+      });
+      this.commentInput = "";
+      this.nameInput = ""
+    }
+  });
+  </script>
+</polymer-element>
